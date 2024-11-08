@@ -1,3 +1,6 @@
+const passport = require("passport");
+require("./passport");
+
 const express = require("express");
 const app = express();
 const port = 3000;
