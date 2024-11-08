@@ -1,3 +1,9 @@
+/* Configuring Passport Strategies 
+Two Passport strategies are defined.
+The first one, "LocalStrategy" defines basic HTTP authentication for login request.
+The second one, "JWTStrategy" allows to authenticate users based on the JWT submitted alongside their request.
+*/
+
 const passport = require("passport");
 (LocalStrategy = require("passport-local").Strategy),
   (Models = require("./models")),
