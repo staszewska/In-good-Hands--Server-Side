@@ -24,42 +24,34 @@ mongoose
   .catch((error) => console.error(error));
 
 // Register new user
-
 app.post("/users", async (req, res) => {
   console.log("Request received for user creation");
 
-  console.log(req.body);
+  try {
+    const existingUser = await Users.findOne({ Email: req.body.Email });
 
-  await Users.findOne({ Email: req.body.Email })
-    .then((user) => {
-      if (user) {
-        // If user already exists
-        console.log("User already exists");
-        return res.status(400).send(req.body.Email + " already exists");
-      } else {
-        // If user does not exists, proceed to create
-        console.log("Create new user");
-        return Users.create({
-          Email: req.body.Email,
-          Password: req.body.Password,
-        });
-      }
-    })
-    .then((user) => {
-      if (user) {
-        console.log("User created");
-        console.log("Creating new user");
-        res.status(200).json(user);
-      }
-    })
-    .catch((error) => {
-      console.log("Error during creation");
-      res.status(500).send("Error: " + error);
+    if (existingUser) {
+      console.log("User already exists");
+      return res.status(400).send(req.body.Email + "is already existing");
+    } else {
+      // If user does not exists, proceed to create
+      console.log("Create new user");
+    }
+
+    const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+    console.log(hashedPassword);
+
+    const newUser = await Users.create({
+      Email: req.body.Email,
+      Password: hashedPassword,
     });
-});
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+    console.log("User created");
+    return res.status(201).send("User created");
+  } catch (error) {
+    console.log("Error during creation");
+    res.status(500).send("Error: " + error);
+  }
 });
 
 // Allow user to log in
@@ -79,9 +71,10 @@ let generateJWTToken = (user) => {
 
 /* POST login. */
 app.post("/login", (req, res) => {
-  //function from passport that authenticates a user.
+  //function from passport that authenticates a user
   passport.authenticate("local", { session: false }, (error, user, info) => {
     if (error || !user) {
+      console.log("User not found");
       return res.status(400).json({
         message: "Something is not right",
         user: user,
@@ -97,4 +90,10 @@ app.post("/login", (req, res) => {
       return res.json({ user, token });
     });
   })(req, res);
+});
+
+// Start server
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
