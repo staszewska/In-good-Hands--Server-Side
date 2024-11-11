@@ -16,30 +16,31 @@ let Users = Models.User,
 passport.use(
   new LocalStrategy(
     {
-      emailField: "Email",
+      usernameField: "Email",
       passwordField: "Password",
     },
     async (email, password, callback) => {
-      console.log(`${email} ${password}`);
-      await Users.findOne({ Email: email });
-    }
-  )
-    .then((user) => {
-      if (!user) {
-        console.log("Incorrect email");
-        return callback(null, false, {
-          message: "Incorrect email or password",
-        });
-      }
-      console.log("finished");
-      return callback(null, user);
-    })
-    .catch((error) => {
-      if (error) {
+      try {
+        // Find the user by email
+        const user = await Users.findOne({ Email: email });
+
+        // Check if user exists
+        if (!user) {
+          console.log("Incorrect email");
+          return callback(null, false, {
+            message: "Incorrect email or password",
+          });
+        }
+
+        console.log("User found, finished");
+        return callback(null, user);
+      } catch (error) {
+        // Catch and handle any errors
         console.log(error);
         return callback(error);
       }
-    })
+    }
+  )
 );
 
 passport.use(
