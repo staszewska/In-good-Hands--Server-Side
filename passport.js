@@ -4,6 +4,8 @@ The first one, "LocalStrategy" defines basic HTTP authentication for login reque
 The second one, "JWTStrategy" allows to authenticate users based on the JWT submitted alongside their request.
 */
 
+const bcrypt = require("bcrypt");
+
 const passport = require("passport");
 (LocalStrategy = require("passport-local").Strategy),
   (Models = require("./models")),
@@ -33,6 +35,13 @@ passport.use(
         }
 
         console.log("User found, finished");
+
+        //use bcrypt to compare the entered password with the stored hashed password
+        const isMatch = await bcrypt.compare(password, user.Password);
+        if (!isMatch) {
+          return callback(null, false, { message: "Incorrect password" });
+        }
+
         return callback(null, user);
       } catch (error) {
         // Catch and handle any errors
