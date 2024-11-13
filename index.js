@@ -1,10 +1,14 @@
 const passport = require("passport");
 require("./passport");
 const bcrypt = require("bcrypt");
+const cors = require("cors");
 
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 8000;
+
+// Use CORS middleware
+app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -32,7 +36,9 @@ app.post("/users", async (req, res) => {
 
     if (existingUser) {
       console.log("User already exists");
-      return res.status(400).send(req.body.Email + "is already existing");
+      return res.status(400).json({
+        Message: req.body.Email + " is already existing",
+      });
     } else {
       // If user does not exists, proceed to create
       console.log("Create new user");
@@ -47,7 +53,9 @@ app.post("/users", async (req, res) => {
     });
 
     console.log("User created");
-    return res.status(201).send("User created");
+    return res.status(201).json({
+      Message: "User created",
+    });
   } catch (error) {
     console.log("Error during creation");
     res.status(500).send("Error: " + error);
