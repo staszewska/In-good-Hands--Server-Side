@@ -84,7 +84,7 @@ app.post("/login", (req, res) => {
     if (error || !user) {
       console.log("User not found");
       return res.status(400).json({
-        message: "Something is not right",
+        message: "User not found",
         user: user,
       });
     }
